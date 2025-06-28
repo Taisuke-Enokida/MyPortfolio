@@ -37,7 +37,7 @@
       backdrop-filter: blur(5px) contrast(200%) brightness(110%) saturate(150%);
       -webkit-backdrop-filter: blur(5px) contrast(200%) brightness(110%) saturate(150%);
       text-align: center;
-      padding: 2rem;
+      /* padding: 2rem; */
     }
 
     #glass-effect {
@@ -54,15 +54,13 @@
     }
 
     #text-container {
-      max-width: 800px;
-      line-height: 1.8;
-      font-size: 1.5rem;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.05em;
-      font-family: 'Orbitron', 'DotGothic16'; 
-    }
+    max-width: 800px;
+    line-height: 1.8;
+    font-size: 7rem;
+    text-align: center;
+    font-family: 'Orbitron', 'DotGothic16';
+    white-space: pre-wrap;
+  }
 
     .char {
       opacity: 0;
@@ -237,25 +235,32 @@
     function setupScrollSection() {
   gsap.registerPlugin(ScrollTrigger);
 
-  const sentence = `Deku Design 3DCG creater`;
+  const sentence = `Deku Design\n3DCG\nCreator`;
   const container = document.getElementById("text-container");
   container.innerHTML = '';
 
+  const chars = [];
+
   sentence.split('').forEach(char => {
-    const span = document.createElement("span");
-    span.classList.add("char");
-    span.textContent = char;
-    container.appendChild(span);
+    if (char === '\n') {
+      const br = document.createElement("br");
+      container.appendChild(br);
+    } else {
+      const span = document.createElement("span");
+      span.classList.add("char");
+      span.textContent = char;
+      container.appendChild(span);
+      chars.push(span);
+    }
   });
 
-  const chars = document.querySelectorAll(".char");
-  const staggerDuration = 5 / sentence.length;
+  const staggerDuration = 5 / chars.length;
 
   ScrollTrigger.create({
     trigger: "#glass-section",
     start: "top top",
     onEnter: () => {
-      stopScrolling(); // ← iOSでも確実にスクロール停止
+      stopScrolling();
 
       gsap.to(chars, {
         opacity: 1,
@@ -265,7 +270,7 @@
         ease: "power2.out",
         onComplete: () => {
           setTimeout(() => {
-            allowScrolling(); // ← スクロール再開
+            allowScrolling();
           }, 500);
         }
       });
@@ -273,6 +278,7 @@
     once: true
   });
 }
+
 
 // iOS含め全ブラウザでスクロール停止
 function stopScrolling() {
