@@ -177,7 +177,7 @@
 
       gsap.to({ t: 0 }, {
         t: 1,
-        duration: 3,
+        duration: 1,
         ease: "none",
         onUpdate: function () {
           t = this.targets()[0].t;
@@ -254,7 +254,7 @@
     }
   });
 
-  const staggerDuration = 5 / chars.length;
+  const staggerDuration = 2 / chars.length;
 
   ScrollTrigger.create({
     trigger: "#glass-section",
@@ -352,7 +352,7 @@ function dissolveModelToParticles() {
 
   model.visible = false;
 
-  // 漂わせた後→再集結→dance.glb読込
+  // 軽量かつ動きのある「円形拡散→再収束」
   const tl = gsap.timeline({
     onComplete: () => {
       scene2.remove(dissolveGroup);
@@ -360,25 +360,30 @@ function dissolveModelToParticles() {
     }
   });
 
-  particles.forEach(p => {
-    tl.to(p.position, {
-      x: (Math.random() - 0.5) * 10,
-      y: (Math.random() - 0.5) * 10,
-      z: (Math.random() - 0.5) * 10,
-      duration: 2,
-      ease: "sine.inOut"
-    }, 0);
-  });
+  particles.forEach((p, i) => {
+    const angle = (i / particles.length) * Math.PI * 2;
+    const radius = 2 + Math.random() * 2;
+    const height = (Math.random() - 0.5) * 4;
 
-  particles.forEach(p => {
+    const x = Math.cos(angle) * radius;
+    const y = height;
+    const z = Math.sin(angle) * radius;
+
+    // 1段目: 円軌道 + ランダムノイズへ
+    tl.to(p.position, {
+      x, y, z,
+      duration: 1.2,
+      ease: "power2.out"
+    }, 0);
+
+    // 2段目: 再収束（中央へ）
     tl.to(p.position, {
       x: 0, y: 0, z: 0,
-      duration: 2,
+      duration: 1.5,
       ease: "power2.inOut"
-    }, 2); // 2秒後に始まるように
+    }, 1.5); // 少し遅らせて開始
   });
 }
-
 
 function loadDanceGLB() {
   const loader = new THREE.GLTFLoader();
