@@ -235,7 +235,7 @@
     function setupScrollSection() {
   gsap.registerPlugin(ScrollTrigger);
 
-  const sentence = `Deku Design\n3DCG\nCreator`;
+  const sentence = `Deku Design\nWEB & 3D\nCreator`;
   const container = document.getElementById("text-container");
   container.innerHTML = '';
 
@@ -312,6 +312,98 @@ function preventDefault(e) {
       if (isScene2Active && mixer) mixer.update(clock.getDelta());
       renderer.render(activeScene, camera);
     }
+
+    ScrollTrigger.create({
+  trigger: "#glass-section",
+  start: "bottom center",
+  onEnter: () => {
+    if (model.visible) {
+      dissolveModelToParticles();
+    }
+  },
+  once: true
+});
+
+function dissolveModelToParticles() {
+  const particles = [];
+  const dissolveGroup = new THREE.Group();
+  scene2.add(dissolveGroup);
+
+  const sampleRate = 20;
+
+  model.traverse(child => {
+    if (child.isMesh && child.geometry.isBufferGeometry) {
+      const posAttr = child.geometry.attributes.position;
+      const worldMatrix = child.matrixWorld;
+
+      for (let i = 0; i < posAttr.count; i += sampleRate) {
+        const vertex = new THREE.Vector3().fromBufferAttribute(posAttr, i);
+        vertex.applyMatrix4(worldMatrix);
+
+        const geo = new THREE.SphereGeometry(0.05, 4, 4);
+        const mat = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+        const p = new THREE.Mesh(geo, mat);
+        p.position.copy(vertex);
+        dissolveGroup.add(p);
+        particles.push(p);
+      }
+    }
+  });
+
+  model.visible = false;
+
+  // 漂わせた後→再集結→dance.glb読込
+  const tl = gsap.timeline({
+    onComplete: () => {
+      scene2.remove(dissolveGroup);
+      loadDanceGLB();
+    }
+  });
+
+  particles.forEach(p => {
+    tl.to(p.position, {
+      x: (Math.random() - 0.5) * 10,
+      y: (Math.random() - 0.5) * 10,
+      z: (Math.random() - 0.5) * 10,
+      duration: 2,
+      ease: "sine.inOut"
+    }, 0);
+  });
+
+  particles.forEach(p => {
+    tl.to(p.position, {
+      x: 0, y: 0, z: 0,
+      duration: 2,
+      ease: "power2.inOut"
+    }, 2); // 2秒後に始まるように
+  });
+}
+
+
+function loadDanceGLB() {
+  const loader = new THREE.GLTFLoader();
+  loader.load("dance.glb", gltf => {
+    const danceModel = gltf.scene;
+    danceModel.scale.set(1.5, 1.5, 1.5);
+    danceModel.position.set(0, -2, -4);
+    danceModel.traverse(c => {
+      if (c.isMesh) {
+        c.material = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true });
+      }
+    });
+
+    if (gltf.animations.length) {
+      const newMixer = new THREE.AnimationMixer(danceModel);
+      gltf.animations.forEach(clip => {
+        newMixer.clipAction(clip).play();
+      });
+      mixer = newMixer;
+    }
+
+    scene2.add(danceModel);
+  });
+}
+
   </script>
 
 </body>
