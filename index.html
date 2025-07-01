@@ -4,28 +4,34 @@
   <meta charset="UTF-8" />
   <title>Three.js Tunnel to Liquid Glass</title>
   <style>
+    :root {
+      --vh: 1vh; /* 初期値を仮に入れておく */
+    }
+  
     body {
       margin: 0;
       overflow: hidden;
       background: black;
       font-family: 'Noto Sans JP', sans-serif;
-      height: 500vh;
+      height: calc(var(--vh, 1vh) * 500); /* 500vh → 動的に対応 */
     }
-
+  
     canvas {
       display: block;
       position: fixed;
       top: 0;
       left: 0;
+      width: 100vw;
+      height: calc(var(--vh, 1vh) * 100);
       z-index: 0;
     }
-
+  
     #glass-section {
       margin: 50px;
       border-radius: 10px;
       position: relative;
-      height: 100vh;
-      top: 200vh;
+      height: calc(var(--vh, 1vh) * 100); /* ← 100vhではなくこちら */
+      top: calc(var(--vh, 1vh) * 200);    /* 200vhに対応 */
       display: none;
       align-items: center;
       justify-content: center;
@@ -37,9 +43,8 @@
       backdrop-filter: blur(5px) contrast(200%) brightness(110%) saturate(150%);
       -webkit-backdrop-filter: blur(5px) contrast(200%) brightness(110%) saturate(150%);
       text-align: center;
-      /* padding: 2rem; */
     }
-
+  
     #glass-effect {
       position: absolute;
       top: 0;
@@ -52,16 +57,16 @@
       filter: blur(40px);
       z-index: -1;
     }
-
+  
     #text-container {
-    max-width: 800px;
-    line-height: 1.8;
-    font-size: 7rem;
-    text-align: center;
-    font-family: 'Orbitron', 'DotGothic16';
-    white-space: pre-wrap;
-  }
-
+      max-width: 800px;
+      line-height: 1.8;
+      font-size: 7rem;
+      text-align: center;
+      font-family: 'Orbitron', 'DotGothic16';
+      white-space: pre-wrap;
+    }
+  
     .char {
       opacity: 0;
       transform: translateY(20px);
@@ -69,6 +74,7 @@
       white-space: pre;
     }
   </style>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+JP:wght@100..900&family=Orbitron:wght@400..900&family=Stick&display=swap" rel="stylesheet">
