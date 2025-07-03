@@ -9,7 +9,7 @@
       overflow: hidden;
       background: black;
       font-family: 'Noto Sans JP', sans-serif;
-      height: 500vh;
+      height: 800vh;
     }
 
     canvas {
@@ -116,16 +116,67 @@
   white-space: pre;
 }
 
+#carousel-section {
+  position: relative;
+  margin: 50px;
+  border-radius: 10px;
+  position: relative;
+  height: 100vh;
+  top: 350vh;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff18;
+  color: white;
+  font-size: 48px;
+  z-index: 1;
+  overflow: hidden;
+  backdrop-filter: blur(5px) contrast(200%) brightness(110%) saturate(150%);
+  -webkit-backdrop-filter: blur(5px) contrast(200%) brightness(110%) saturate(150%);
+  text-align: center;
+}
+
+#carousel-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 150%;
+  height: 150%;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 70%);
+  pointer-events: none;
+  opacity: 0.6;
+  filter: blur(40px);
+  z-index: -1;
+}
+
+#carousel-text-container {
+  max-width: 800px;
+  position: absolute;
+  font-size: 7rem;
+  top: 40px; 
+  font-family: 'Orbitron', 'DotGothic16';
+  text-align: center;
+}
+
+#carousel-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+}
+
 footer {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 40px;
+  height: 50px;
   display: flex;
-  justify-content: space-between; /* ←左右端寄せで圧縮されにくい */
+  justify-content: space-around;
   align-items: center;
-  padding: 0 40px; /* ← 左右余白 */
   font-family: 'Orbitron', sans-serif;
   font-size: 14px; /* px指定でもOK */
   z-index: 2;
@@ -135,7 +186,7 @@ footer a {
   color: #00ffff;
   text-decoration: none;
   white-space: nowrap; /* ← 改行させない */
-  font-size: 14px;
+  font-size: 28px;
 }
 
 footer a:hover {
@@ -159,6 +210,13 @@ footer a:hover {
 <section id="skills-section">
   <div id="skills-text-container"></div>
   <div id="skills-effect"></div>
+</section>
+
+<!-- カルーセルセクション -->
+<section id="carousel-section">
+  <div id="carousel-text-container">Gallery</div>
+  <div id="carousel-effect"></div>
+  <canvas id="carousel-canvas"></canvas>
 </section>
 
 <footer>
@@ -192,6 +250,7 @@ footer a:hover {
       camera.position.z = 0.1;
 
       renderer = new THREE.WebGLRenderer({ antialias: true });
+      if (isScene2Active) updateCameraByViewport();
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
 
@@ -616,12 +675,77 @@ function loadDanceGLB() {
 
     animateCamera();
     setTimeout(() => {
-  document.getElementById('skills-section').style.display = 'flex';
-  document.body.style.overflow = 'auto';
-  setupSkillsScrollSection();
-}, 3000); // danceカメラ演出後に表示
+    document.getElementById('skills-section').style.display = 'flex';
+    setupSkillsScrollSection();
 
+    setTimeout(() => {
+      document.getElementById('carousel-section').style.display = 'flex';
+      createCarousel();
+    }, 2000);
+  }, 3000);
   });
+}
+
+function createCarousel() {
+  const canvas = document.getElementById('carousel-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+  camera.position.z = 8;
+
+  const group = new THREE.Group();
+  const boxGeometry = new THREE.BoxGeometry(1.2, 1.6, 0.01);
+  const loader = new THREE.TextureLoader();
+  const textureIDs = [1015, 1016, 1018, 1020, 1024];
+  const radius = 3;
+
+  const textures = textureIDs.map(id =>
+    loader.load(`https://picsum.photos/id/${id}/240/320`)
+  );
+
+  textures.forEach((tex, i) => {
+    const material = new THREE.MeshBasicMaterial({ map: tex });
+    const mesh = new THREE.Mesh(boxGeometry, material);
+    const angle = (i / textures.length) * Math.PI * 2;
+    mesh.position.set(radius * Math.cos(angle), 0, radius * Math.sin(angle));
+    mesh.lookAt(0, 0, 0);
+    group.add(mesh);
+  });
+
+  scene.add(group);
+
+  let rotationSpeed = 0.005;
+
+  gsap.to({}, {
+    scrollTrigger: {
+      trigger: '#carousel-section',
+      start: 'top bottom',
+      end: 'bottom top',
+      scrub: true,
+      onUpdate: self => {
+        rotationSpeed = 0.005 + 0.015 * self.progress;
+      }
+    }
+  });
+
+  function resizeCarouselCanvas() {
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    if (canvas.width !== width || canvas.height !== height) {
+      renderer.setSize(width, height, false);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    }
+  }
+
+  function animateCarousel() {
+    requestAnimationFrame(animateCarousel);
+    resizeCarouselCanvas();
+    group.rotation.y += rotationSpeed;
+    renderer.render(scene, camera);
+  }
+
+  animateCarousel();
 }
 
 </script>
