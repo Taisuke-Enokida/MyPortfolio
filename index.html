@@ -372,7 +372,7 @@ footer a:hover {
             vec3 col1 = vec3(0.0, 0.0, 0.0);          // 黒ベース（暗いまま）
             vec3 col2 = vec3(0.05, 0.05, 0.1);         // 少し明るいネイビー
             vec3 col3 = vec3(0.1, 0.12, 0.3);          // 明るめのダークブルー
-            vec3 col4 = vec3(0.15, 0.5, 0.5);         // さらに明るい青
+            vec3 col4 = vec3(0.15, 0.25, 0.5);         // さらに明るい青
 
             vec3 top = mix(col3, col4, p);
             vec3 bottom = mix(col1, col2, p);
@@ -393,7 +393,7 @@ footer a:hover {
       scene2.add(backgroundMesh);
 
       function updateTime() {
-        material.uniforms.time.value += 0.01;
+        material.uniforms.time.value += 0.1;
         requestAnimationFrame(updateTime);
       }
       updateTime();
