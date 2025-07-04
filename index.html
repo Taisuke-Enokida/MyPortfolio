@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>Three.js Tunnel to Liquid Glass</title>
+  <title>My Portfolio</title>
   <style>
     body {
       margin: 0;
@@ -153,7 +153,7 @@
   max-width: 800px;
   position: absolute;
   font-size: 7rem;
-  top: 40px; 
+  top: 100px; 
   font-family: 'Orbitron', 'DotGothic16';
   text-align: center;
 }
@@ -193,7 +193,6 @@ footer a:hover {
   text-decoration: underline;
 }
 
-
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -207,22 +206,22 @@ footer a:hover {
   </section>
 
   <!-- スキルズセクション -->
-<section id="skills-section">
-  <div id="skills-text-container"></div>
-  <div id="skills-effect"></div>
-</section>
+  <section id="skills-section">
+    <div id="skills-text-container"></div>
+    <div id="skills-effect"></div>
+  </section>
 
-<!-- カルーセルセクション -->
-<section id="carousel-section">
-  <div id="carousel-text-container">Gallery</div>
-  <div id="carousel-effect"></div>
-  <canvas id="carousel-canvas"></canvas>
-</section>
+  <!-- カルーセルセクション -->
+  <section id="carousel-section">
+    <div id="carousel-text-container">Gallery</div>
+    <div id="carousel-effect"></div>
+    <canvas id="carousel-canvas"></canvas>
+  </section>
 
-<footer>
-  <div><a href="https://skycreate-gloup.com/contact/">Contact</a></div>
-  <div><a href="https://www.instagram.com/kaihin_official">Instagram</a></div>
-</footer>
+  <footer>
+    <div><a href="https://skycreate-gloup.com/contact/">Contact</a></div>
+    <div><a href="https://www.instagram.com/kaihin_official">Instagram</a></div>
+  </footer>
 
 
   <!-- Three.js & GSAP -->
@@ -404,7 +403,6 @@ footer a:hover {
       activeScene = scene2;
       updateCameraByViewport();
 
-      // ✅ ここで問題なく呼び出せる
       createGradientBackground();
 
       setTimeout(() => {
@@ -564,15 +562,15 @@ function preventDefault(e) {
     }
 
     ScrollTrigger.create({
-  trigger: "#glass-section",
-  start: "bottom center",
-  onEnter: () => {
-    if (model.visible) {
-      dissolveModelToParticles();
-    }
-  },
-  once: true
-});
+      trigger: "#glass-section",
+      start: "bottom center",
+      onEnter: () => {
+        if (model.visible) {
+          dissolveModelToParticles();
+        }
+      },
+      once: true
+    });
 
 function dissolveModelToParticles() {
   const particles = [];
